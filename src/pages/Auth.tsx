@@ -61,10 +61,11 @@ const Auth = () => {
         title: "Welcome Back!",
         description: "You have successfully logged in.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Login Failed",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -119,10 +120,11 @@ const Auth = () => {
         title: "Account Created!",
         description: "Welcome to Shadiwala. You can now manage your products.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
       toast({
         title: "Signup Failed",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     }
