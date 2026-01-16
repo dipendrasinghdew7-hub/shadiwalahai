@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
+import { auth, db } from "@/lib/firebase";
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  updateProfile
+} from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { User, Mail, Lock, LogIn, UserPlus } from "lucide-react";
 
@@ -26,23 +33,14 @@ const Auth = () => {
   const [signupName, setSignupName] = useState("");
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/wholesaler");
-      }
-    };
-    checkUser();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
         navigate("/wholesaler");
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -57,21 +55,17 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail.trim(),
-      password: loginPassword,
-    });
-
-    if (error) {
+    try {
+      await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
+      toast({
+        title: "Welcome Back!",
+        description: "You have successfully logged in.",
+      });
+    } catch (error: any) {
       toast({
         title: "Login Failed",
         description: error.message,
         variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Welcome Back!",
-        description: "You have successfully logged in.",
       });
     }
     setLoading(false);
@@ -98,27 +92,38 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: signupEmail.trim(),
-      password: signupPassword,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: {
-          full_name: signupName.trim(),
-        },
-      },
-    });
+    try {
+      // Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        signupEmail.trim(),
+        signupPassword
+      );
 
-    if (error) {
+      // Update user profile with display name
+      await updateProfile(userCredential.user, {
+        displayName: signupName.trim(),
+      });
+
+      // Save user data to Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        email: signupEmail.trim(),
+        fullName: signupName.trim(),
+        userType: "wholesaler",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      toast({
+        title: "Account Created!",
+        description: "Welcome to Shadiwala. You can now manage your products.",
+      });
+    } catch (error: any) {
       toast({
         title: "Signup Failed",
         description: error.message,
         variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Account Created!",
-        description: "Welcome to Shadiwala. You can now manage your products.",
       });
     }
     setLoading(false);
