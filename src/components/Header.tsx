@@ -41,9 +41,9 @@ const Header = () => {
             Browse Products
           </Link>
           <Link
-            to="/wholesaler"
+            to="/auth"
             className={`text-sm font-medium transition-colors hover:text-primary ${
-              isActive("/wholesaler") ? "text-primary" : "text-muted-foreground"
+              isActive("/auth") || isActive("/wholesaler") ? "text-primary" : "text-muted-foreground"
             }`}
           >
             For Wholesalers
@@ -59,7 +59,7 @@ const Header = () => {
             </Link>
           </Button>
           <Button asChild>
-            <Link to="/wholesaler">
+            <Link to="/auth">
               <Store className="h-4 w-4 mr-2" />
               List Products
             </Link>
@@ -98,10 +98,10 @@ const Header = () => {
               Browse Products
             </Link>
             <Link
-              to="/wholesaler"
+              to="/auth"
               onClick={() => setMobileMenuOpen(false)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive("/wholesaler") ? "bg-primary text-primary-foreground" : "hover:bg-secondary"
+                isActive("/auth") || isActive("/wholesaler") ? "bg-primary text-primary-foreground" : "hover:bg-secondary"
               }`}
             >
               For Wholesalers
