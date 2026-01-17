@@ -2,14 +2,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Firebase configuration - Replace these with your Firebase project credentials
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBjP_fgUXZfxQcK8mrtcioq2dGTYfc51pQ",
+  authDomain: "shadiwala-website.firebaseapp.com",
+  projectId: "shadiwala-website",
+  storageBucket: "shadiwala-website.firebasestorage.app",
+  messagingSenderId: "405166393523",
+  appId: "1:405166393523:web:925cd3eb7b9ba0ce3688c6",
+  measurementId: "G-P506GRX6BJ"
 };
 
 // Initialize Firebase
